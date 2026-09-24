@@ -464,6 +464,200 @@ if (
 
 
 // ============================================================
+// ADD GALLERY IMAGE
+// ============================================================
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['add_gallery'])
+) {
+
+    $title      = trim($_POST['title'] ?? '');
+    $sort_order = (int) ($_POST['sort_order'] ?? 0);
+
+    try {
+
+        $image_path = uploadToSupabase(
+            $_FILES['gallery_image'] ?? null
+        );
+
+        if (!$image_path) {
+
+            throw new Exception(
+                'Please select an image to upload.'
+            );
+        }
+
+        $stmt = $pdo->prepare("
+            INSERT INTO ksb_gallery
+            (
+                title,
+                image_path,
+                display,
+                sort_order
+            )
+            VALUES
+            (
+                :title,
+                :image_path,
+                TRUE,
+                :sort_order
+            )
+        ");
+
+        $stmt->execute([
+
+            ':title'      => $title,
+
+            ':image_path' => $image_path,
+
+            ':sort_order' => $sort_order
+
+        ]);
+
+        $success_message =
+            'Gallery image added successfully.';
+    } catch (Exception $e) {
+
+        $error_message =
+            $e->getMessage();
+    }
+}
+
+
+// ============================================================
+// UPDATE GALLERY IMAGE
+// ============================================================
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['update_gallery'])
+) {
+
+    $id         = (int) ($_POST['id'] ?? 0);
+    $title      = trim($_POST['title'] ?? '');
+    $sort_order = (int) ($_POST['sort_order'] ?? 0);
+
+    try {
+
+        // Get current image path
+
+        $stmt = $pdo->prepare("
+            SELECT image_path
+            FROM ksb_gallery
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+            ':id' => $id
+        ]);
+
+        $existing = $stmt->fetch();
+
+        if (!$existing) {
+
+            throw new Exception(
+                'Gallery image not found.'
+            );
+        }
+
+        $image_path = $existing['image_path'];
+
+        // Replace image if a new one was selected
+
+        if (
+            isset($_FILES['gallery_image']) &&
+            $_FILES['gallery_image']['error'] !== UPLOAD_ERR_NO_FILE
+        ) {
+
+            $image_path = uploadToSupabase(
+                $_FILES['gallery_image']
+            );
+        }
+
+        $stmt = $pdo->prepare("
+            UPDATE ksb_gallery
+            SET
+                title      = :title,
+                image_path = :image_path,
+                sort_order = :sort_order
+            WHERE id = :id
+        ");
+
+        $stmt->execute([
+
+            ':title'      => $title,
+
+            ':image_path' => $image_path,
+
+            ':sort_order' => $sort_order,
+
+            ':id'         => $id
+
+        ]);
+
+        $success_message =
+            'Gallery image updated successfully.';
+    } catch (Exception $e) {
+
+        $error_message =
+            $e->getMessage();
+    }
+}
+
+
+// ============================================================
+// TOGGLE GALLERY VISIBILITY
+// ============================================================
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['toggle_gallery'])
+) {
+
+    $id = (int) ($_POST['id'] ?? 0);
+
+    $stmt = $pdo->prepare("
+        UPDATE ksb_gallery
+        SET display = NOT display
+        WHERE id = :id
+    ");
+
+    $stmt->execute([
+        ':id' => $id
+    ]);
+
+    $success_message =
+        'Gallery image visibility updated.';
+}
+
+
+// ============================================================
+// DELETE GALLERY IMAGE
+// ============================================================
+
+if (
+    $_SERVER['REQUEST_METHOD'] === 'POST' &&
+    isset($_POST['delete_gallery'])
+) {
+
+    $id = (int) ($_POST['id'] ?? 0);
+
+    $stmt = $pdo->prepare("
+        DELETE FROM ksb_gallery
+        WHERE id = :id
+    ");
+
+    $stmt->execute([
+        ':id' => $id
+    ]);
+
+    $success_message =
+        'Gallery image deleted successfully.';
+}
+
+
+// ============================================================
 // ADD PROJECT
 // ============================================================
 
@@ -516,7 +710,7 @@ if (
 
             ':image_path'  => $image_path,
 
-            ':image_path_2'=> $image_path_2
+            ':image_path_2' => $image_path_2
 
         ]);
 
@@ -621,7 +815,7 @@ if (
 
             ':image_path'  => $image_path,
 
-            ':image_path_2'=> $image_path_2,
+            ':image_path_2' => $image_path_2,
 
             ':id'          => $id
 
@@ -740,6 +934,29 @@ if ($active_section === 'messages') {
     ");
 
     $messages = $stmt->fetchAll();
+}
+
+// ============================================================
+// LOAD GALLERY
+// ============================================================
+
+$gallery = [];
+
+if ($active_section === 'gallery') {
+
+    $stmt = $pdo->query("
+        SELECT
+            id,
+            title,
+            image_path,
+            display,
+            sort_order,
+            created_at
+        FROM ksb_gallery
+        ORDER BY sort_order ASC, id ASC
+    ");
+
+    $gallery = $stmt->fetchAll();
 }
 
 ?>
@@ -962,6 +1179,34 @@ if ($active_section === 'messages') {
 
                                 <p class="text-muted">
                                     View messages submitted through the website.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+
+                </div>
+
+                <div class="col-md-4">
+
+                    <a
+                        href="dashboard.php?section=gallery"
+                        class="text-decoration-none">
+
+                        <div class="card h-100 shadow-sm border-0">
+
+                            <div class="card-body p-4">
+
+                                <i class="bi bi-collection fs-2"></i>
+
+                                <h4 class="mt-3">
+                                    Gallery
+                                </h4>
+
+                                <p class="text-muted">
+                                    Upload and manage carousel images.
                                 </p>
 
                             </div>
@@ -1476,6 +1721,291 @@ if ($active_section === 'messages') {
                 <?php endforeach; ?>
 
             <?php endif; ?>
+
+        <?php endif; ?>
+
+
+        <!-- ========================================================
+         GALLERY
+    ========================================================= -->
+
+        <?php if ($active_section === 'gallery'): ?>
+
+            <div class="mb-4">
+
+                <a
+                    href="dashboard.php"
+                    class="btn btn-outline-secondary">
+
+                    ← Dashboard
+
+                </a>
+
+            </div>
+
+
+            <h2 class="mb-4">
+                Gallery
+            </h2>
+
+
+            <!-- ADD IMAGE -->
+
+            <div class="card shadow-sm border-0 mb-5">
+
+                <div class="card-body p-4">
+
+                    <h4 class="mb-4">
+                        Add Gallery Image
+                    </h4>
+
+
+                    <form
+                        method="POST"
+                        enctype="multipart/form-data">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label class="form-label">
+                                    Image
+                                </label>
+
+                                <input
+                                    type="file"
+                                    name="gallery_image"
+                                    class="form-control"
+                                    accept="image/jpeg,image/png,image/webp,image/gif"
+                                    required>
+
+                                <small class="text-muted">
+                                    Maximum 5 MB. Recommended 1920 × 800.
+                                </small>
+
+                            </div>
+
+
+                            <div class="col-md-4">
+
+                                <label class="form-label">
+                                    Caption (optional)
+                                </label>
+
+                                <input
+                                    type="text"
+                                    name="title"
+                                    class="form-control">
+
+                            </div>
+
+
+                            <div class="col-md-2">
+
+                                <label class="form-label">
+                                    Sort order
+                                </label>
+
+                                <input
+                                    type="number"
+                                    name="sort_order"
+                                    class="form-control"
+                                    value="0">
+
+                                <small class="text-muted">
+                                    Lower = first.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            name="add_gallery"
+                            class="btn btn-brand mt-4">
+
+                            Add Image
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+
+            <!-- EXISTING IMAGES -->
+
+            <h3 class="mb-4">
+                Existing Images
+            </h3>
+
+
+            <?php if (count($gallery) === 0): ?>
+
+                <div class="alert alert-info">
+
+                    No gallery images have been added yet.
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <div class="row g-4">
+
+                <?php foreach ($gallery as $image): ?>
+
+                    <div class="col-md-6 col-lg-4">
+
+                        <div class="card shadow-sm border-0 h-100">
+
+                            <img
+                                src="<?php echo htmlspecialchars($image['image_path']); ?>"
+                                alt="<?php echo htmlspecialchars($image['title'] ?? 'Gallery image'); ?>"
+                                style="width: 100%; height: 180px; object-fit: cover;">
+
+                            <div class="card-body p-3">
+
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                    <span class="badge <?php echo $image['display'] ? 'bg-success' : 'bg-secondary'; ?>">
+
+                                        <?php echo $image['display'] ? 'Visible' : 'Hidden'; ?>
+
+                                    </span>
+
+
+                                    <small class="text-muted">
+
+                                        #<?php echo $image['sort_order']; ?>
+
+                                    </small>
+
+                                </div>
+
+
+                                <form
+                                    method="POST"
+                                    enctype="multipart/form-data">
+
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?php echo $image['id']; ?>">
+
+
+                                    <div class="mb-2">
+
+                                        <label class="form-label small">
+                                            Caption
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="title"
+                                            class="form-control form-control-sm"
+                                            value="<?php echo htmlspecialchars($image['title'] ?? ''); ?>">
+
+                                    </div>
+
+
+                                    <div class="mb-2">
+
+                                        <label class="form-label small">
+                                            Sort order
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            name="sort_order"
+                                            class="form-control form-control-sm"
+                                            value="<?php echo $image['sort_order']; ?>">
+
+                                    </div>
+
+
+                                    <div class="mb-3">
+
+                                        <label class="form-label small">
+                                            Replace image (optional)
+                                        </label>
+
+                                        <input
+                                            type="file"
+                                            name="gallery_image"
+                                            class="form-control form-control-sm"
+                                            accept="image/jpeg,image/png,image/webp,image/gif">
+
+                                    </div>
+
+
+                                    <button
+                                        type="submit"
+                                        name="update_gallery"
+                                        class="btn btn-brand btn-sm w-100">
+
+                                        Save Changes
+
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    class="mt-2">
+
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?php echo $image['id']; ?>">
+
+                                    <button
+                                        type="submit"
+                                        name="toggle_gallery"
+                                        class="btn btn-outline-secondary btn-sm w-100">
+
+                                        <?php echo $image['display'] ? 'Hide' : 'Show'; ?>
+
+                                    </button>
+
+                                </form>
+
+
+                                <form
+                                    method="POST"
+                                    class="mt-2"
+                                    onsubmit="return confirm('Permanently delete this image? This cannot be undone.');">
+
+                                    <input
+                                        type="hidden"
+                                        name="id"
+                                        value="<?php echo $image['id']; ?>">
+
+                                    <button
+                                        type="submit"
+                                        name="delete_gallery"
+                                        class="btn btn-outline-danger btn-sm w-100">
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                <?php endforeach; ?>
+
+            </div>
 
         <?php endif; ?>
 

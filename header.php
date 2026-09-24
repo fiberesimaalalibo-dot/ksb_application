@@ -53,6 +53,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <a href="index.php#about" class="nav-link">About Us</a>
                     <a href="index.php#services" class="nav-link">Services</a>
                     <a href="index.php#projects" class="nav-link">Projects</a>
+                    <a href="index.php#gallery" class="nav-link">Gallery</a>
                     <a href="index.php#contact" class="nav-link">Contact</a>
 
                     <?php if (isset($_SESSION['admin_id'])): ?>

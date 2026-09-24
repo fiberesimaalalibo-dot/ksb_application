@@ -135,9 +135,22 @@ $stmt = $pdo->query("
 
 $projects = $stmt->fetchAll();
 
+
+
+// ============================================================
+// GET VISIBLE GALLERY IMAGES
+// ============================================================
+
+$stmt = $pdo->query("
+SELECT id, title, image_path
+FROM ksb_gallery
+WHERE display = TRUE
+ORDER BY sort_order ASC, id ASC
+");
+
+$gallery = $stmt->fetchAll();
+
 ?>
-
-
 <!-- ============================================================
      HERO
 ============================================================= -->
@@ -274,6 +287,133 @@ $projects = $stmt->fetchAll();
     </div>
 
 </section>
+
+<!-- ============================================================
+     GALLERY
+============================================================= -->
+
+<section id="gallery" class="gallery-section section-padding">
+
+    <div class="container">
+
+        <div class="section-heading text-center mx-auto">
+
+            <span>OUR GALLERY</span>
+
+            <h2>
+                A glimpse of our work
+            </h2>
+
+            <p>
+                Highlights from our projects, operations and team in the field.
+            </p>
+
+        </div>
+
+
+        <?php if (count($gallery) > 0): ?>
+
+            <div
+                id="ksbGalleryCarousel"
+                class="carousel slide ksb-carousel"
+                data-bs-ride="carousel"
+                data-bs-interval="5000">
+
+                <!-- Indicators -->
+
+                <div class="carousel-indicators">
+
+                    <?php foreach ($gallery as $index => $image): ?>
+
+                        <button
+                            type="button"
+                            data-bs-target="#ksbGalleryCarousel"
+                            data-bs-slide-to="<?php echo $index; ?>"
+                            class="<?php echo $index === 0 ? 'active' : ''; ?>"
+                            aria-current="<?php echo $index === 0 ? 'true' : 'false'; ?>"
+                            aria-label="Slide <?php echo $index + 1; ?>">
+                        </button>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+
+                <!-- Slides -->
+
+                <div class="carousel-inner">
+
+                    <?php foreach ($gallery as $index => $image): ?>
+
+                        <div class="carousel-item <?php echo $index === 0 ? 'active' : ''; ?>">
+
+                            <img
+                                src="<?php echo htmlspecialchars($image['image_path']); ?>"
+                                alt="<?php echo htmlspecialchars($image['title'] ?? 'KSB Enterprise gallery image'); ?>"
+                                class="ksb-carousel-image">
+
+                            <?php if (!empty($image['title'])): ?>
+
+                                <div class="carousel-caption ksb-carousel-caption d-none d-md-block">
+
+                                    <h5>
+                                        <?php echo htmlspecialchars($image['title']); ?>
+                                    </h5>
+
+                                </div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+
+                <!-- Controls -->
+
+                <button
+                    class="carousel-control-prev"
+                    type="button"
+                    data-bs-target="#ksbGalleryCarousel"
+                    data-bs-slide="prev">
+
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+
+                    <span class="visually-hidden">Previous</span>
+
+                </button>
+
+
+                <button
+                    class="carousel-control-next"
+                    type="button"
+                    data-bs-target="#ksbGalleryCarousel"
+                    data-bs-slide="next">
+
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+
+                    <span class="visually-hidden">Next</span>
+
+                </button>
+
+            </div>
+
+        <?php else: ?>
+
+            <div class="alert alert-info text-center">
+
+                Gallery images will appear here soon.
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+</section>
+
 
 
 <!-- ============================================================

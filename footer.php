@@ -34,6 +34,7 @@
                     <li><a href="index.php#about">About Us</a></li>
                     <li><a href="index.php#services">Services</a></li>
                     <li><a href="index.php#projects">Projects</a></li>
+                    <li><a href="index.php#gallery">Gallery</a></li>
                     <li><a href="index.php#contact">Contact</a></li>
 
                 </ul>
@@ -100,6 +101,7 @@
     </div>
 
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
