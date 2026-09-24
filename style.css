@@ -754,3 +754,43 @@ h5 {
     }
 
 }
+
+/* ============================================================
+   DOWNLOADABLE PROFILE SECTION
+============================================================ */
+
+.download-section {
+    background: var(--light);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+}
+
+
+.download-label {
+    color: var(--brand-green);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+}
+
+
+.download-section h2 {
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    margin-top: 0.5rem;
+}
+
+
+.download-section p {
+    color: var(--text);
+    max-width: 550px;
+}
+
+
+@media (max-width: 991px) {
+
+    .download-section .text-lg-end {
+        text-align: left !important;
+    }
+
+}

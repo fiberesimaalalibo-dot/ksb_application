@@ -232,6 +232,52 @@ $gallery = $stmt->fetchAll();
 
 
 <!-- ============================================================
+     DOWNLOADABLE PROFILE
+============================================================= -->
+
+<section class="download-section section-padding">
+
+    <div class="container">
+
+        <div class="row align-items-center g-4">
+
+            <div class="col-lg-8">
+
+                <span class="download-label">
+                    COMPANY PROFILE
+                </span>
+
+                <h2 class="mt-2">
+                    Download our subsidiary profile
+                </h2>
+
+                <p class="mb-0">
+                    Get detailed information about our subsidiary, services, and capabilities in a single PDF.
+                </p>
+
+            </div>
+
+            <div class="col-lg-4 text-lg-end">
+
+                <a
+                    href="subsidiary_profile.pdf"
+                    download="KSB-Subsidiary-Profile.pdf"
+                    class="btn btn-brand btn-lg">
+
+                    <i class="bi bi-file-earmark-pdf me-2"></i>
+                    Download PDF
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ============================================================
      SERVICES
 ============================================================= -->
 
