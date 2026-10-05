@@ -47,17 +47,20 @@
                 <h5>Contact</h5>
 
                 <p>
-                    Port Harcourt, Rivers State
+                    Plot 200B Zone 3, <b />Finima, Bonny, Rivers State
                 </p>
 
                 <p>
                     <i class="bi bi-envelope me-2"></i>
-                    Email address
+                    Email address: <a href="mailto:ksboperations@gmail.com,">
+                        ksboperations@gmail.com
+                    </a>
                 </p>
 
                 <p>
                     <i class="bi bi-telephone me-2"></i>
-                    Phone number
+                    Phone number: <a href="tel:+2348037752829">+2348037752829</a> <br />
+                    Phone number: <a href="tel:+2348068737863">+2348068737863</a>
                 </p>
 
             </div>
