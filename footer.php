@@ -60,6 +60,7 @@
                 <p>
                     <i class="bi bi-telephone me-2"></i>
                     Phone number: <a href="tel:+2348037752829">+2348037752829</a> <br />
+                    <i class="bi bi-telephone me-2"></i>
                     Phone number: <a href="tel:+2348068737863">+2348068737863</a>
                 </p>
 
